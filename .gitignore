@@ -1,0 +1,15 @@
+# Виртуальное окружение
+venv/
+__pycache__/
+
+# Персональные настройки
+*.env
+*.log
+*.sqlite3
+
+# PyCharm / VSCode
+.idea/
+.vscode/
+
+# Mac и другие системные файлы
+.DS_Store
