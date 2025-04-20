@@ -17,8 +17,8 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 
-from bot.config import BOT_TOKEN          # Загрузка токена из .env
-from bot.handlers import start, help            # Хендлеры, например: /start
+from bot.config import BOT_TOKEN                            # Загрузка токена из .env
+from bot.handlers import start, help, ads, routes           # Хендлеры, например: /start
 
 async def main():
     """
@@ -37,6 +37,8 @@ async def main():
     # Подключаем все зарегистрированные обработчики (например, /start)
     dp.include_router(start.router)
     dp.include_router(help.router)
+    dp.include_router(ads.router)
+    dp.include_router(routes.router)
 
     # Запускаем бота
     await dp.start_polling(bot)
