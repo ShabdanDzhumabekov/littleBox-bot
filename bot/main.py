@@ -12,13 +12,20 @@
 """
 
 import asyncio
+import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 
-from bot.config import BOT_TOKEN                            # Загрузка токена из .env
-from bot.handlers import start, help, ads, routes           # Хендлеры, например: /start
+from bot.config import BOT_TOKEN                    # Загрузка токена из .env  
+from bot.handlers import setup_routers              # Хендлеры, например: /start
+
+# Настраиваем логгирование
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
 
 async def main():
     """
@@ -35,14 +42,15 @@ async def main():
     dp = Dispatcher(storage=MemoryStorage())
 
     # Подключаем все зарегистрированные обработчики (например, /start)
-    dp.include_router(start.router)
-    dp.include_router(help.router)
-    dp.include_router(ads.router)
-    dp.include_router(routes.router)
+    dp.include_router(setup_routers())
 
     # Запускаем бота
+    logging.info("🤖 Bot is starting...")
     await dp.start_polling(bot)
 
 # Точка входа
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("⛔ Bot stopped.")

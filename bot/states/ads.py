@@ -9,5 +9,5 @@ class AdForm(StatesGroup):
     description = State()
     from_location = State()
     to_location = State()
-    approx_date_text = State()
+    approx_date = State()
     price = State()
