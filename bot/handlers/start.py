@@ -17,18 +17,19 @@ router = Router()
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
+    """
+    Регистрирует пользователя и показывает приветственное сообщение.
+    """
     telegram_id = message.from_user.id
     username = message.from_user.username
     today = date.today()
 
     async for session in get_session():
-        # Проверяем: есть ли уже такой пользователь
         stmt = select(User).where(User.telegram_id == telegram_id)
         result = await session.execute(stmt)
         user = result.scalar_one_or_none()
 
         if not user:
-            # Создаём нового пользователя
             new_user = User(
                 telegram_id=telegram_id,
                 username=username,
@@ -40,9 +41,14 @@ async def cmd_start(message: types.Message):
         else:
             print(f"👤 Existing user: {telegram_id}")
 
-    # Отправляем сообщение пользователю
     await message.answer(
-        f"👋 Привет, {username or 'гость'}! Добро пожаловать в LittleBox!\n"
-        "📦 Ты можешь отправить посылку или предложить маршрут.",
-        reply_markup=main_menu()
+        f"👋 Привет, {username or 'гость'}! Добро пожаловать в <b>LittleBox</b> 📦\n\n"
+        "🔹 <b>Здесь ты можешь:</b>\n"
+        "• Отправить или получить посылку\n"
+        "• Разместить маршрут путешествия\n"
+        "• Найти подходящего попутчика или посылку\n"
+        "• Управлять своими объявлениями\n\n"
+        "⬇️ Используй кнопки внизу для начала!",
+        reply_markup=main_menu(),
+        parse_mode="HTML"
     )

@@ -11,5 +11,6 @@ def main_menu():
         [KeyboardButton(text="🔍 Найти путешественника")],
         [KeyboardButton(text="🔍 Найти посылку")],
         [KeyboardButton(text="📋 Мои объявления")],
+        [KeyboardButton(text="💬 Оставить отзыв")]
     ]
     return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
