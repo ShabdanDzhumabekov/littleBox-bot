@@ -4,7 +4,14 @@
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-def main_menu():
+
+def main_menu(is_admin: bool = False) -> ReplyKeyboardMarkup:
+    """
+    Главное меню. Если пользователь — админ, добавляет кнопку "🛠 Админ-панель".
+
+    :param is_admin: Является ли пользователь администратором
+    :return: Объект ReplyKeyboardMarkup
+    """
     keyboard = [
         [KeyboardButton(text="📦 Разместить объявление")],
         [KeyboardButton(text="🛫 Я лечу (маршрут)")],
@@ -13,4 +20,8 @@ def main_menu():
         [KeyboardButton(text="📋 Мои объявления")],
         [KeyboardButton(text="💬 Оставить отзыв")]
     ]
+
+    if is_admin:
+        keyboard.append([KeyboardButton(text="🛠 Админ-панель")])
+
     return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)

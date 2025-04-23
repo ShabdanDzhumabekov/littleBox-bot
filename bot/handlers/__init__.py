@@ -11,6 +11,7 @@ from .edit_ad import router as edit_ad_router
 from .edit_route import router as edit_route_router
 from .feedback import router as feedback_router
 from .stats import router as stats_router
+from .admin import router as admin_router
 
 def setup_routers() -> Router:
     router = Router()
@@ -25,5 +26,6 @@ def setup_routers() -> Router:
     router.include_router(edit_route_router)
     router.include_router(feedback_router)
     router.include_router(stats_router)
+    router.include_router(admin_router)
 
     return router
