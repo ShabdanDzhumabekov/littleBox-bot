@@ -10,10 +10,11 @@ from aiogram.filters import CommandStart
 from bot.keyboards.menu import main_menu
 from bot.database.models import User
 from bot.database.db import get_session
+from bot.filters.is_admin import IsAdmin
 from sqlalchemy import select
 from datetime import date
 
-from bot.filters.is_admin import ADMIN_ID  # ← импортируем admin ID из фильтра
+#from bot.filters.is_admin import ADMIN_ID  # ← импортируем admin ID из фильтра
 
 router = Router()
 
@@ -25,8 +26,6 @@ async def cmd_start(message: types.Message):
     telegram_id = message.from_user.id
     username = message.from_user.username
     today = date.today()
-
-    is_admin = telegram_id == ADMIN_ID
 
     async for session in get_session():
         stmt = select(User).where(User.telegram_id == telegram_id)
@@ -53,6 +52,6 @@ async def cmd_start(message: types.Message):
         "• Найти подходящего попутчика или посылку\n"
         "• Управлять своими объявлениями\n\n"
         "⬇️ Используй кнопки внизу для начала!",
-        reply_markup=main_menu(is_admin),
+        reply_markup=main_menu(is_admin=await IsAdmin()(message)),
         parse_mode="HTML"
     )

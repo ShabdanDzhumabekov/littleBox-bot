@@ -9,6 +9,7 @@ from aiogram.fsm.context import FSMContext
 from bot.states.ads_view import FindAdForm
 from bot.utils.location import parse_location
 from sqlalchemy import select
+from datetime import datetime
 from bot.database.db import get_session
 from bot.database.models import Ad, User
 
@@ -46,8 +47,9 @@ async def input_to_location(message: types.Message, state: FSMContext):
             Ad.from_city == data["from_city"],
             Ad.from_country == data["from_country"],
             Ad.to_city == to_city,
-            Ad.to_country == to_country
-        ).order_by(Ad.id.desc())
+            Ad.to_country == to_country,
+            Ad.approx_date >= datetime.now().date()
+        ).order_by(Ad.approx_date.asc())
 
         result = await session.execute(stmt)
         ads = result.all()

@@ -4,6 +4,7 @@
 """
 
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 from aiogram.types import Message
 
 # Инициализация геокодера
@@ -17,7 +18,10 @@ def parse_location(text: str):
     :param text: Строка вида "Москва, Россия"
     :return: (город, страна) или (None, None)
     """
-    location = geolocator.geocode(text, addressdetails=True, language="en")
+    try:
+        location = geolocator.geocode(text, addressdetails=True, language="ru", timeout=5)
+    except GeocoderTimedOut:
+        return "timeout", "timeout"
 
     if not location:
         return None, None
@@ -43,10 +47,16 @@ async def get_location_or_reply(message: Message):
     :return: (город, страна) или None
     """
     city, country = parse_location(message.text)
+    
+    if (city, country) == ("timeout", "timeout"):
+        await message.answer("🌐 Временная ошибка при определении города. Попробуйте ещё раз.")
+        return None
+
     if not city or not country:
         await message.answer(
             "❗️Не удалось определить город и страну. Пример: <code>Город, Страна</code>",
             parse_mode="HTML"
         )
         return None
+    
     return city, country

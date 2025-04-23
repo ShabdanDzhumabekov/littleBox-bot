@@ -9,7 +9,13 @@ from sqlalchemy import select
 from bot.database.db import get_session
 from bot.database.models import Route, User
 from bot.states.edit_route import EditRouteForm
-from bot.utils import get_location_or_reply, get_user_or_reply, validate_date_input
+from bot.keyboards.inline import route_inline_keyboard
+from bot.utils import (
+    get_location_or_reply,
+    get_user_or_reply,
+    validate_date_input,
+    format_route
+)
 
 router = Router()
 
@@ -70,7 +76,7 @@ async def edit_date(message: types.Message, state: FSMContext):
         return
 
     await state.update_data(travel_date=result)
-    await message.answer("🧳 Укажите багаж:")
+    await message.answer("🧳 Что вы можете взять с собой?\n(например: до 2 кг, маленький пакет)")
     await state.set_state(EditRouteForm.luggage)
 
 
@@ -112,6 +118,9 @@ async def finish_edit(message: types.Message, state: FSMContext):
         route.conditions = data["conditions"]
 
         await session.commit()
+
+        await message.answer("Вот как выглядит ваш маршрут после редактирования:")
+        await message.answer(format_route(route), reply_markup=route_inline_keyboard(route.id), parse_mode="HTML")
 
     await message.answer("✅ Маршрут успешно обновлён!")
     await state.clear()

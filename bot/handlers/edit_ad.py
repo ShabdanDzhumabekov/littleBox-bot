@@ -9,7 +9,13 @@ from sqlalchemy import select
 from bot.database.db import get_session
 from bot.database.models import Ad, User
 from bot.states.edit_ad import EditAdForm
-from bot.utils import get_location_or_reply, get_user_or_reply, validate_date_input
+from bot.keyboards.inline import ad_inline_keyboard
+from bot.utils import (
+    get_location_or_reply,
+    get_user_or_reply,
+    validate_date_input,
+    format_ad
+)
 
 router = Router()
 
@@ -112,6 +118,9 @@ async def finish_edit(message: types.Message, state: FSMContext):
         ad.price = data["price"]
 
         await session.commit()
+
+        await message.answer("Вот как выглядит ваше объявление после редактирования:")
+        await message.answer(format_ad(ad), reply_markup=ad_inline_keyboard(ad.id), parse_mode="HTML")
 
     await message.answer("✅ Объявление обновлено!")
     await state.clear()

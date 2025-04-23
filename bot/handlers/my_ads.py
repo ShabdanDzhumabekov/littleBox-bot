@@ -11,10 +11,11 @@
 
 from aiogram import Router, types, F
 from aiogram.types import CallbackQuery
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy import select
 from bot.database.db import get_session
 from bot.database.models import User, Ad, Route
+from bot.utils import format_ad, format_route
+from bot.keyboards.inline import ad_inline_keyboard, route_inline_keyboard
 
 router = Router()
 
@@ -43,28 +44,7 @@ async def my_ads(message: types.Message):
         if ads:
             await message.answer("📦 <b>Ваши объявления о посылках:</b>", parse_mode="HTML")
             for ad in ads:
-                text = (
-                    f"📦 <b>{ad.type.title()}</b>\n"
-                    f"📝 <i>{ad.description}</i>\n"
-                    f"🌍 {ad.from_city}, {ad.from_country} ➡️ {ad.to_city}, {ad.to_country}\n"
-                    f"📅 Актуально до: {ad.approx_date.strftime('%d.%m.%Y')}\n"
-                    f"💵 {ad.price}"
-                )
-                keyboard = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✏️ Редактировать",
-                                callback_data=f"edit_ad_{ad.id}"
-                            ),
-                            InlineKeyboardButton(
-                                text="❌ Удалить",
-                                callback_data=f"delete_ad_{ad.id}"
-                            )
-                        ]
-                    ]
-                )
-                await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
+                await message.answer(format_ad(ad), reply_markup=ad_inline_keyboard(ad.id), parse_mode="HTML")
 
         # 🛫 Получаем маршруты
         stmt_routes = select(Route).where(Route.user_id == user.id).order_by(Route.id.desc())
@@ -74,28 +54,7 @@ async def my_ads(message: types.Message):
         if routes:
             await message.answer("🛫 <b>Ваши маршруты:</b>", parse_mode="HTML")
             for route in routes:
-                text = (
-                    f"🛫 <b>Маршрут</b>\n"
-                    f"🌍 {route.from_city}, {route.from_country} ➡️ {route.to_city}, {route.to_country}\n"
-                    f"📅 {route.travel_date.strftime('%d.%m.%Y')}\n"
-                    f"🧳 {route.luggage}\n"
-                    f"💬 {route.conditions or '—'}"
-                )
-                keyboard = InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✏️ Редактировать",
-                                callback_data=f"edit_route_{route.id}"
-                            ),
-                            InlineKeyboardButton(
-                                text="❌ Удалить",
-                                callback_data=f"delete_route_{route.id}"
-                            )
-                        ]
-                    ]
-                )
-                await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
+                await message.answer(format_route(route), reply_markup=route_inline_keyboard(route.id), parse_mode="HTML")
 
         if not ads and not routes:
             await message.answer("📭 У вас пока нет объявлений или маршрутов.")
