@@ -14,8 +14,9 @@ from aiogram.types import ReplyKeyboardRemove
 from sqlalchemy import select
 
 from bot.states.route import RouteForm
-from bot.database.models import Route, User
+from bot.database.models import Route
 from bot.database.db import get_session
+from bot.keyboards.menu import main_menu
 from bot.utils import get_location_or_reply, get_user_or_reply, validate_date_input
 
 router = Router()
@@ -111,5 +112,5 @@ async def finish_route(message: types.Message, state: FSMContext):
         session.add(new_route)
         await session.commit()
 
-    await message.answer("✅ Маршрут добавлен! Спасибо!", reply_markup=ReplyKeyboardRemove())
+    await message.answer("✅ Маршрут добавлен! Спасибо!", reply_markup=main_menu())
     await state.clear()

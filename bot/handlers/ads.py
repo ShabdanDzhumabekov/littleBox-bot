@@ -16,6 +16,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from bot.states.ads import AdForm
 from bot.database.models import Ad
 from bot.database.db import get_session
+from bot.keyboards.menu import main_menu
 from bot.utils import (
     get_user_or_reply,
     get_location_or_reply,
@@ -142,5 +143,5 @@ async def input_price(message: types.Message, state: FSMContext):
         session.add(new_ad)
         await session.commit()
 
-    await message.answer("✅ Объявление добавлено! Спасибо.")
+    await message.answer("✅ Объявление добавлено! Спасибо.", reply_markup=main_menu())
     await state.clear()
