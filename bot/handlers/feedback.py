@@ -2,38 +2,35 @@
 📨 feedback.py — Хендлеры для работы с отзывами пользователей
 
 Функции:
-- Кнопка "✉️ Оставить отзыв" → бот предлагает ввести сообщение
+- Кнопка "💬 Оставить отзыв" → бот предлагает ввести сообщение
 - Сохраняет отзыв в таблицу `feedbacks`
-- Админ может получить список последних отзывов через команду `/feedbacks`
-
-Используется в главном меню
+- Команда /feedbacks доступна только администратору — показывает последние отзывы
 """
 
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command
-from html import escape as quote_html
 from sqlalchemy import select
 
 from bot.database.db import get_session
 from bot.database.models import Feedback, User
+from bot.filters import IsAdmin
 
 router = Router()
 
-# 🔐 Telegram ID администратора
-ADMIN_ID = 433288212
 
-
-# 🚦 Состояние для FSM — пользователь пишет отзыв
 class FeedbackForm(StatesGroup):
+    """
+    Состояния для FSM: пользователь пишет отзыв
+    """
     writing = State()
 
 
 @router.message(F.text == "💬 Оставить отзыв")
 async def ask_feedback(message: types.Message, state: FSMContext):
     """
-    Старт ввода отзыва. Предлагаем пользователю ввести текст.
+    Начало ввода отзыва. Просим пользователя написать текст.
     """
     await message.answer("📝 Напишите свой отзыв, мы обязательно прочитаем!")
     await state.set_state(FeedbackForm.writing)
@@ -59,20 +56,16 @@ async def save_feedback(message: types.Message, state: FSMContext):
         session.add(feedback)
         await session.commit()
 
-        await message.answer("✅ Спасибо за отзыв!")
-
+    await message.answer("✅ Спасибо за отзыв!")
     await state.clear()
 
 
-@router.message(Command("feedbacks"))
+@router.message(Command("feedbacks"), IsAdmin())
 async def show_feedbacks(message: types.Message):
     """
-    Только для администратора.
-    Показывает 5 последних отзывов с username, датой и текстом.
+    Команда доступна только администратору.
+    Показывает 5 последних отзывов с датой, username и текстом.
     """
-    if message.from_user.id != ADMIN_ID:
-        return  # Игнорируем чужие вызовы
-
     async for session in get_session():
         stmt = select(Feedback, User).join(User).order_by(Feedback.id.desc()).limit(5)
         result = await session.execute(stmt)
@@ -86,6 +79,6 @@ async def show_feedbacks(message: types.Message):
             text = (
                 f"📝 <b>Отзыв от @{user.username or 'Без username'}</b>\n"
                 f"🗓 {fb.created_at.strftime('%d.%m.%Y %H:%M')}\n\n"
-                f"{quote_html(fb.text)}"
+                f"{fb.text}"
             )
             await message.answer(text, parse_mode="HTML")

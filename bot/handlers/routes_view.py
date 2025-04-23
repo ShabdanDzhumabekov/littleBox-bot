@@ -81,6 +81,8 @@ async def input_to_location(message: types.Message, state: FSMContext):
             await message.answer("😔 Нет подходящих маршрутов из нужной страны.")
             await state.clear()
             return
+        
+        await message.answer(f"🛫 Найдено: {len(routes_to_show)} маршрутов")
 
         for route, user in routes_to_show:
             text = (
