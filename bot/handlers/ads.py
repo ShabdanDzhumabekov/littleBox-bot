@@ -16,11 +16,14 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 from bot.states.ads import AdForm
 from bot.database.models import Ad
 from bot.database.db import get_session
+from bot.filters.is_admin import IsAdmin
 from bot.keyboards.menu import main_menu
+from bot.keyboards.inline import ad_inline_keyboard
 from bot.utils import (
     get_user_or_reply,
     get_location_or_reply,
     validate_date_input,
+    format_ad
 )
 
 router = Router()
@@ -143,5 +146,10 @@ async def input_price(message: types.Message, state: FSMContext):
         session.add(new_ad)
         await session.commit()
 
-    await message.answer("✅ Объявление добавлено! Спасибо.", reply_markup=main_menu())
+        # ✉️ Показываем добавленное объявление
+        await message.answer("Вот как выглядит ваше объявление:")
+        await message.answer(format_ad(new_ad), reply_markup=ad_inline_keyboard(new_ad.id), parse_mode="HTML")
+
+
+    await message.answer("✅ Объявление добавлено!",reply_markup=main_menu(is_admin=await IsAdmin()(message)))
     await state.clear()

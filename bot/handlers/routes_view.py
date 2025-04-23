@@ -12,6 +12,7 @@ from aiogram.fsm.context import FSMContext
 from bot.states.routes_view import FindRouteForm
 from bot.utils.location import parse_location
 from sqlalchemy import select
+from datetime import datetime
 from bot.database.db import get_session
 from bot.database.models import Route, User
 
@@ -52,10 +53,11 @@ async def input_to_location(message: types.Message, state: FSMContext):
     async for session in get_session():
         # 1. Фильтруем маршруты по месту назначения (обязательно)
         stmt = select(Route, User).join(User).where(
-            Route.to_country == to_country
-        )
+            Route.to_country == to_country,
+            Route.travel_date >= datetime.now().date()
+        ).order_by(Route.travel_date.asc())
         if to_city:
-            stmt = stmt.where(Route.to_city == to_city)
+            stmt = stmt.where(Route.to_city == to_city).order_by(Route.travel_date.asc())
 
         result = await session.execute(stmt)
         all_routes = result.all()
