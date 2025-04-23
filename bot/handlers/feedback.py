@@ -61,6 +61,7 @@ async def save_feedback(message: types.Message, state: FSMContext):
 
 
 @router.message(Command("feedbacks"), IsAdmin())
+@router.message(F.text == "💬 Отзывы", IsAdmin())
 async def show_feedbacks(message: types.Message):
     """
     Команда доступна только администратору.
