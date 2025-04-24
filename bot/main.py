@@ -20,6 +20,7 @@ from aiogram.client.default import DefaultBotProperties
 
 from bot.config import BOT_TOKEN                    # Загрузка токена из .env  
 from bot.handlers import setup_routers              # Хендлеры, например: /start
+from bot.middlewares import RateLimitMiddleware
 
 # Настраиваем логгирование
 logging.basicConfig(
@@ -40,6 +41,10 @@ async def main():
 
     # Создаём диспетчер с хранением состояний в оперативной памяти
     dp = Dispatcher(storage=MemoryStorage())
+
+    # 🔒 Middleware: ограничение по частоте сообщений
+    dp.message.middleware(RateLimitMiddleware(limit_seconds=0.8))
+    dp.callback_query.middleware(RateLimitMiddleware(limit_seconds=0.5))
 
     # Подключаем все зарегистрированные обработчики (например, /start)
     dp.include_router(setup_routers())
