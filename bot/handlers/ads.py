@@ -12,6 +12,7 @@ FSM: Подача объявления пользователем (ads).
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+import asyncio
 
 from bot.states.ads import AdForm
 from bot.database.models import Ad
@@ -23,7 +24,8 @@ from bot.utils import (
     get_user_or_reply,
     get_location_or_reply,
     validate_date_input,
-    format_ad
+    format_ad,
+    notify_about_new_ad
 )
 
 router = Router()
@@ -146,9 +148,16 @@ async def input_price(message: types.Message, state: FSMContext):
         session.add(new_ad)
         await session.commit()
 
+        # Обязательно обновить объект, чтобы подтянулся new_ad.user
+        await session.refresh(new_ad, attribute_names=["user"])
+
         # ✉️ Показываем добавленное объявление
         await message.answer("Вот как выглядит ваше объявление:")
         await message.answer(format_ad(new_ad), reply_markup=ad_inline_keyboard(new_ad.id), parse_mode="HTML")
+
+        # Отправляем уведомление пользователю с похожим маршрутом
+        await asyncio.sleep(2)
+        await notify_about_new_ad(message.bot, new_ad)
 
 
     await message.answer("✅ Объявление добавлено!",reply_markup=main_menu(is_admin=await IsAdmin()(message)))

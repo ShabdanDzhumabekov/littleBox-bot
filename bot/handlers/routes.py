@@ -10,7 +10,7 @@ FSM: Подача маршрута путешественником (routes).
 
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import asyncio
 
 from bot.states.route import RouteForm
 from bot.database.models import Route
@@ -22,7 +22,8 @@ from bot.utils import (
     get_location_or_reply,
     get_user_or_reply,
     validate_date_input,
-    format_route
+    format_route,
+    notify_about_new_route
 )
 
 router = Router()
@@ -118,9 +119,17 @@ async def finish_route(message: types.Message, state: FSMContext):
         session.add(new_route)
         await session.commit()
 
+         # Обязательно обновить объект, чтобы подтянулся new_route.user
+        await session.refresh(new_route, attribute_names=["user"])
+
         # ✈️ Показываем добавленный маршрут
         await message.answer("Вот как выглядит ваш маршрут:")
         await message.answer(format_route(new_route), reply_markup=route_inline_keyboard(new_route.id), parse_mode="HTML")
+
+         # Отправляем уведомление пользователю об объявлении с похожим маршрутом
+        await asyncio.sleep(2)
+        await notify_about_new_route(message.bot, new_route)
+
 
     await message.answer("✅ Маршрут добавлен! Спасибо!", reply_markup=main_menu(is_admin=await IsAdmin()(message)))
     await state.clear()
