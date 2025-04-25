@@ -4,12 +4,7 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-from bot.config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
-
-# Строка подключения к базе в формате для asyncpg
-DATABASE_URL = (
-    f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
+from bot.config import DATABASE_URL
 
 # Создание движка подключения
 engine = create_async_engine(DATABASE_URL, echo=True)
