@@ -5,7 +5,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 class AdForm(StatesGroup):
-    type = State()
     description = State()
     from_location = State()
     to_location = State()

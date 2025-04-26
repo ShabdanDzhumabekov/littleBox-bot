@@ -67,7 +67,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
                 f"📝 <i>{ad.description}</i>\n"
                 f"🌍 {ad.from_city}, {ad.from_country} ➡️ {ad.to_city}, {ad.to_country}\n"
                 f"📅 Актуально до: {ad.approx_date.strftime('%d.%m.%Y')}\n"
-                f"💵 {ad.price}\n"
+                f"💵 {ad.price}$\n"
                 f"👤 @{user.username or 'Без username'}"
             )
             await message.answer(text, parse_mode="HTML")

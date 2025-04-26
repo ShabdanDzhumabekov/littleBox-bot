@@ -13,7 +13,7 @@ def main_menu(is_admin: bool = False) -> ReplyKeyboardMarkup:
     :return: Объект ReplyKeyboardMarkup
     """
     keyboard = [
-        [KeyboardButton(text="📦 Разместить объявление")],
+        [KeyboardButton(text="📦 Хочу отправить")],
         [KeyboardButton(text="🛫 Я лечу (маршрут)")],
         [KeyboardButton(text="🔍 Найти путешественника")],
         [KeyboardButton(text="🔍 Найти посылку")],

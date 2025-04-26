@@ -17,11 +17,10 @@ def format_ad(ad: Ad) -> str:
     :return: Строка с HTML-разметкой
     """
     return (
-        f"📦 <b>{ad.type.title()}</b>\n"
         f"📝 <i>{ad.description}</i>\n"
         f"🌍 {ad.from_city}, {ad.from_country} ➡️ {ad.to_city}, {ad.to_country}\n"
         f"📅 Актуально до: {ad.approx_date.strftime('%d.%m.%Y')}\n"
-        f"💵 {ad.price}"
+        f"💵 {ad.price}$"
     )
 
 
