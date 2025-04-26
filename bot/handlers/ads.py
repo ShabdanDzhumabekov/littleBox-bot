@@ -1,11 +1,10 @@
 """
 FSM: Подача объявления пользователем (ads).
-1. Выбор типа объявления (отправка/получение)
-2. Описание
-3. Откуда (распознавание города и страны)
-4. Куда (аналогично)
-5. Дата (до какой даты актуально — в формате ДД.ММ.ГГГГ)
-6. Цена
+1. Описание
+2. Откуда (распознавание города и страны)
+3. Куда (аналогично)
+4. Дата (до какой даты актуально — в формате ДД.ММ.ГГГГ)
+5. Цена
 Сохраняется в таблицу ads.
 """
 
@@ -30,32 +29,11 @@ from bot.utils import (
 
 router = Router()
 
-@router.message(F.text == "📦 Разместить объявление")
-async def choose_type(message: types.Message, state: FSMContext):
+@router.message(F.text == "📦 Хочу отправить")
+async def start_ads(message: types.Message, state: FSMContext):
     """
-    Старт подачи объявления.
-    Показывает клавиатуру с выбором: отправить или получить посылку.
+    Старт FSM: спрашиваем, детали посылки.
     """
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="📤 Отправить"), KeyboardButton(text="📥 Получить")]],
-        resize_keyboard=True
-    )
-    await message.answer("Вы хотите отправить или получить посылку?", reply_markup=keyboard)
-    await state.set_state(AdForm.type)
-
-
-@router.message(AdForm.type)
-async def set_type(message: types.Message, state: FSMContext):
-    """
-    Обработка выбора типа: отправка или получение.
-    """
-    if message.text not in ["📤 Отправить", "📥 Получить"]:
-        await message.answer("Пожалуйста, выберите один из вариантов кнопками.")
-        return
-
-    ad_type = "отправка" if message.text == "📤 Отправить" else "получение"
-    await state.update_data(type=ad_type)
-
     await message.answer("Что вы хотите отправить?", reply_markup=ReplyKeyboardRemove())
     await state.set_state(AdForm.description)
 
@@ -116,7 +94,7 @@ async def input_date(message: types.Message, state: FSMContext):
         return
 
     await state.update_data(approx_date=result)
-    await message.answer("💵 Укажите цену за доставку:")
+    await message.answer("💵 Укажите цену за доставку в $ :")
     await state.set_state(AdForm.price)
 
 
@@ -136,7 +114,6 @@ async def input_price(message: types.Message, state: FSMContext):
     async for session in get_session():
         new_ad = Ad(
             user_id=user.id,
-            type=data["type"],
             description=data["description"],
             from_city=data["from_city"],
             from_country=data["from_country"],

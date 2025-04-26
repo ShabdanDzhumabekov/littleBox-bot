@@ -27,7 +27,6 @@ class Ad(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    type = Column(String, nullable=False)  # отправка / получение
     description = Column(String, nullable=False)
 
     from_city = Column(String, nullable=False)

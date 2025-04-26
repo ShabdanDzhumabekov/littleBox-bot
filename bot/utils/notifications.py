@@ -42,7 +42,8 @@ async def notify_about_new_ad(bot: Bot, ad: Ad):
                 await bot.send_message(
                     user.telegram_id,
                     "📦 Появилось новое объявление, подходящее под ваш маршрут:\n\n" +
-                    format_ad(ad),
+                    format_ad(ad) + "\n" +
+                    f"👤 @{user.username or 'Без username'}",
                     parse_mode="HTML"
                 )
 
@@ -70,6 +71,7 @@ async def notify_about_new_route(bot: Bot, route: Route):
                 await bot.send_message(
                     user.telegram_id,
                     "🛫 Появился путешественник, подходящий под ваше объявление:\n\n" +
-                    format_route(route),
+                    format_route(route) + "\n" +
+                    f"👤 @{user.username or 'Без username'}",
                     parse_mode="HTML"
                 )
