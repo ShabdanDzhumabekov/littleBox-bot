@@ -63,7 +63,6 @@ async def input_to_location(message: types.Message, state: FSMContext):
 
         for ad, user in ads:
             text = (
-                f"📦 <b>{ad.type.title()}</b>\n"
                 f"📝 <i>{ad.description}</i>\n"
                 f"🌍 {ad.from_city}, {ad.from_country} ➡️ {ad.to_city}, {ad.to_country}\n"
                 f"📅 Актуально до: {ad.approx_date.strftime('%d.%m.%Y')}\n"
