@@ -33,7 +33,7 @@ async def start_route(message: types.Message, state: FSMContext):
     """
     Старт FSM: спрашиваем, откуда пользователь вылетает.
     """
-    await message.answer("Откуда вы летите?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("Откуда вы летите?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(RouteForm.from_location)
 
 
@@ -48,7 +48,7 @@ async def set_from_location(message: types.Message, state: FSMContext):
     city, country = result
 
     await state.update_data(from_city=city, from_country=country)
-    await message.answer("Куда вы летите?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("Куда вы летите?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(RouteForm.to_location)
 
 

@@ -47,7 +47,7 @@ async def start_edit_ad(callback: types.CallbackQuery, state: FSMContext):
 @router.message(EditAdForm.description)
 async def edit_description(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
-    await message.answer("🌍 Откуда будет отправка? (пример: Город, Страна):")
+    await message.answer("🌍 Откуда будет отправка? (пример: \"Город, Страна\"):")
     await state.set_state(EditAdForm.from_location)
 
 
@@ -59,7 +59,7 @@ async def edit_from_location(message: types.Message, state: FSMContext):
     city, country = result
 
     await state.update_data(from_city=city, from_country=country)
-    await message.answer("🌍 Куда нужно доставить? (пример: Город, Страна):")
+    await message.answer("🌍 Куда нужно доставить? (пример: \"Город, Страна\"):")
     await state.set_state(EditAdForm.to_location)
 
 

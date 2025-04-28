@@ -44,7 +44,7 @@ async def input_description(message: types.Message, state: FSMContext):
     Получает описание посылки от пользователя.
     """
     await state.update_data(description=message.text)
-    await message.answer("Откуда будет отправка?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("Откуда будет отправка?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(AdForm.from_location)
 
 
@@ -59,7 +59,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
     city, country = result
 
     await state.update_data(from_city=city, from_country=country)
-    await message.answer("Куда нужно доставить?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("Куда нужно доставить?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(AdForm.to_location)
 
 
