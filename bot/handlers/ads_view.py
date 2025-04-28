@@ -17,7 +17,7 @@ router = Router()
 
 @router.message(F.text == "🔍 Найти посылку")
 async def start_find_ad(message: types.Message, state: FSMContext):
-    await message.answer("📍 Из какого города и страны будет отправка?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("📍 Из какого города и страны будет отправка?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindAdForm.from_location)
 
 @router.message(FindAdForm.from_location)
@@ -29,7 +29,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
         return
 
     await state.update_data(from_city=city, from_country=country)
-    await message.answer("📦 Куда нужно доставить?\n\nПример: <code>Город, Страна</code>", parse_mode="HTML")
+    await message.answer("📦 Куда нужно доставить?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindAdForm.to_location)
 
 @router.message(FindAdForm.to_location)
@@ -37,7 +37,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
     to_city, to_country = parse_location(message.text)
 
     if not to_country:
-        await message.answer("❗ Не удалось определить точку назначения. Пример: <code>Белград, Сербия</code>", parse_mode="HTML")
+        await message.answer("❗ Не удалось определить точку назначения. Пример: <code>\"Белград, Сербия\"</code>", parse_mode="HTML")
         return
 
     data = await state.get_data()
