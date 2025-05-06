@@ -14,7 +14,8 @@ from bot.utils import (
     get_location_or_reply,
     get_user_or_reply,
     validate_date_input,
-    format_route
+    format_route,
+    validate_text
 )
 
 router = Router()
@@ -82,6 +83,9 @@ async def edit_date(message: types.Message, state: FSMContext):
 
 @router.message(EditRouteForm.luggage)
 async def edit_luggage(message: types.Message, state: FSMContext):
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(luggage=message.text)
     await message.answer("💬 Укажите дополнительные условия (или '—'):")
     await state.set_state(EditRouteForm.conditions)
@@ -92,6 +96,9 @@ async def finish_edit(message: types.Message, state: FSMContext):
     """
     Финальное обновление маршрута в базе данных.
     """
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(conditions=message.text)
     data = await state.get_data()
     telegram_id = message.from_user.id

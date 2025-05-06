@@ -3,6 +3,7 @@ from .db import get_user_or_reply
 from .calendar import validate_date_input
 from .formatters import format_ad, format_route
 from .notifications import notify_about_new_ad, notify_about_new_route
+from .validation import validate_text
 
 __all__ = [
     "parse_location",
@@ -12,5 +13,6 @@ __all__ = [
     "format_ad",
     "format_route",
     "notify_about_new_ad",
-    "notify_about_new_route"
+    "notify_about_new_route",
+    "validate_text"
 ]

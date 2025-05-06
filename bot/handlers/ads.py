@@ -24,7 +24,8 @@ from bot.utils import (
     get_location_or_reply,
     validate_date_input,
     format_ad,
-    notify_about_new_ad
+    notify_about_new_ad,
+    validate_text
 )
 
 router = Router()
@@ -43,6 +44,9 @@ async def input_description(message: types.Message, state: FSMContext):
     """
     Получает описание посылки от пользователя.
     """
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(description=message.text)
     await message.answer("Откуда будет отправка?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(AdForm.from_location)
@@ -76,8 +80,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
     await state.update_data(to_city=city, to_country=country)
     await message.answer(
         "📅 До какой даты будет актуально это объявление?\n"
-        "Введите дату в формате <code>ДД.ММ.ГГГГ</code>\n"
-        "(максимум 30 дней вперёд)",
+        "Введите дату в формате <code>ДД.ММ.ГГГГ</code>",
         parse_mode="HTML"
     )
     await state.set_state(AdForm.approx_date)
@@ -88,7 +91,7 @@ async def input_date(message: types.Message, state: FSMContext):
     """
     Получает дату в формате ДД.ММ.ГГГГ и проверяет её корректность.
     """
-    ok, result = validate_date_input(message.text, max_days=30)
+    ok, result = validate_date_input(message.text)
     if not ok:
         await message.answer(result, parse_mode="HTML")
         return
@@ -103,6 +106,9 @@ async def input_price(message: types.Message, state: FSMContext):
     """
     Финальный шаг. Получает цену, сохраняет объявление в БД.
     """
+    if not await validate_text(message, message.text, 10):
+        return
+    
     await state.update_data(price=message.text)
     data = await state.get_data()
     telegram_id = message.from_user.id
@@ -134,7 +140,7 @@ async def input_price(message: types.Message, state: FSMContext):
 
         # Отправляем уведомление пользователю с похожим маршрутом
         await asyncio.sleep(2)
-        await notify_about_new_ad(message.bot, new_ad)
+        await notify_about_new_ad(message.bot, new_ad.id)
 
 
     await message.answer("✅ Объявление добавлено!",reply_markup=main_menu(is_admin=await IsAdmin()(message)))
