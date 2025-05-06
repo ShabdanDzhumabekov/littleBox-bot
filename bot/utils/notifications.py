@@ -14,12 +14,13 @@
 
 from aiogram import Bot
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from bot.database.models import Ad, Route, User
 from bot.database.db import get_session
 from bot.utils import format_ad, format_route
 
 
-async def notify_about_new_ad(bot: Bot, ad: Ad):
+async def notify_about_new_ad(bot: Bot, ad_id: int):
     """
     Уведомляет пользователей, у которых есть подходящие маршруты под новое объявление.
 
@@ -27,6 +28,10 @@ async def notify_about_new_ad(bot: Bot, ad: Ad):
     :param ad: Объект объявления (Ad), только что добавленного
     """
     async for session in get_session():
+        ad = await session.get(Ad, ad_id, options=[selectinload(Ad.user)])  # сразу загрузи user
+        if not ad:
+            return
+
         stmt = select(Route, User).join(User).where(
             Route.from_city == ad.from_city,
             Route.from_country == ad.from_country,
@@ -43,12 +48,12 @@ async def notify_about_new_ad(bot: Bot, ad: Ad):
                     user.telegram_id,
                     "📦 Появилось новое объявление, подходящее под ваш маршрут:\n\n" +
                     format_ad(ad) + "\n" +
-                    f"👤 @{user.username or 'Без username'}",
+                    f"👤 @{ad.user.username or 'Без username'}",
                     parse_mode="HTML"
                 )
 
 
-async def notify_about_new_route(bot: Bot, route: Route):
+async def notify_about_new_route(bot: Bot, route_id: int):
     """
     Уведомляет пользователей, у которых есть подходящие объявления под новый маршрут.
 
@@ -56,6 +61,10 @@ async def notify_about_new_route(bot: Bot, route: Route):
     :param route: Объект маршрута (Route), только что добавленного
     """
     async for session in get_session():
+        route = await session.get(Route, route_id, options=[selectinload(Route.user)])
+        if not route:
+            return 
+
         stmt = select(Ad, User).join(User).where(
             Ad.from_city == route.from_city,
             Ad.from_country == route.from_country,
@@ -72,6 +81,6 @@ async def notify_about_new_route(bot: Bot, route: Route):
                     user.telegram_id,
                     "🛫 Появился путешественник, подходящий под ваше объявление:\n\n" +
                     format_route(route) + "\n" +
-                    f"👤 @{user.username or 'Без username'}",
+                    f"👤 @{route.user.username or 'Без username'}",
                     parse_mode="HTML"
                 )
