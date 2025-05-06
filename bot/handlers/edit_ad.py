@@ -14,7 +14,8 @@ from bot.utils import (
     get_location_or_reply,
     get_user_or_reply,
     validate_date_input,
-    format_ad
+    format_ad,
+    validate_text
 )
 
 router = Router()
@@ -46,6 +47,9 @@ async def start_edit_ad(callback: types.CallbackQuery, state: FSMContext):
 
 @router.message(EditAdForm.description)
 async def edit_description(message: types.Message, state: FSMContext):
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(description=message.text)
     await message.answer("🌍 Откуда будет отправка? (пример: \"Город, Страна\"):")
     await state.set_state(EditAdForm.from_location)
@@ -77,7 +81,7 @@ async def edit_to_location(message: types.Message, state: FSMContext):
 
 @router.message(EditAdForm.approx_date)
 async def edit_date(message: types.Message, state: FSMContext):
-    ok, result = validate_date_input(message.text, max_days=30)
+    ok, result = validate_date_input(message.text)
     if not ok:
         await message.answer(result, parse_mode="HTML")
         return
@@ -92,6 +96,9 @@ async def finish_edit(message: types.Message, state: FSMContext):
     """
     Финальный шаг: сохранение отредактированного объявления.
     """
+    if not await validate_text(message, message.text, 10):
+        return
+    
     await state.update_data(price=message.text)
     data = await state.get_data()
     telegram_id = message.from_user.id
