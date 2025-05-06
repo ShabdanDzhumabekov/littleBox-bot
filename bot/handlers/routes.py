@@ -23,7 +23,8 @@ from bot.utils import (
     get_user_or_reply,
     validate_date_input,
     format_route,
-    notify_about_new_route
+    notify_about_new_route,
+    validate_text
 )
 
 router = Router()
@@ -87,6 +88,9 @@ async def set_luggage(message: types.Message, state: FSMContext):
     """
     Обработка ввода багажа.
     """
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(luggage=message.text)
     await message.answer("💬 Укажите дополнительные условия (или просто '—'):")
     await state.set_state(RouteForm.conditions)
@@ -97,6 +101,9 @@ async def finish_route(message: types.Message, state: FSMContext):
     """
     Финальный шаг — сохранение маршрута в БД.
     """
+    if not await validate_text(message, message.text):
+        return
+    
     await state.update_data(conditions=message.text)
     data = await state.get_data()
     telegram_id = message.from_user.id
@@ -128,7 +135,7 @@ async def finish_route(message: types.Message, state: FSMContext):
 
          # Отправляем уведомление пользователю об объявлении с похожим маршрутом
         await asyncio.sleep(2)
-        await notify_about_new_route(message.bot, new_route)
+        await notify_about_new_route(message.bot, new_route.id)
 
 
     await message.answer("✅ Маршрут добавлен! Спасибо!", reply_markup=main_menu(is_admin=await IsAdmin()(message)))

@@ -16,6 +16,7 @@ from sqlalchemy import select
 from bot.database.db import get_session
 from bot.database.models import Feedback, User
 from bot.filters import IsAdmin
+from bot.constants import MAX_FEEDBACK_LENGTH
 
 router = Router()
 
@@ -41,6 +42,9 @@ async def save_feedback(message: types.Message, state: FSMContext):
     """
     Сохраняет отзыв пользователя в базу данных.
     """
+    if not await validate_text(message, message.text, MAX_FEEDBACK_LENGTH):
+        return
+    
     text = message.text.strip()
     telegram_id = message.from_user.id
 
