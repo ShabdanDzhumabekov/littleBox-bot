@@ -17,6 +17,7 @@ router = Router()
 
 @router.message(F.text == "🔍 Найти посылку")
 async def start_find_ad(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer("📍 Из какого города и страны будет отправка?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindAdForm.from_location)
 

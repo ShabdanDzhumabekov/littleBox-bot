@@ -21,6 +21,7 @@ router = Router()
 # 🔹 Шаг 1 — пользователь нажал "🔍 Найти путешественника"
 @router.message(F.text == "🔍 Найти путешественника")
 async def start_find_route(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer("📍 Откуда вы хотите отправить посылку?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindRouteForm.from_location)
 

@@ -12,6 +12,7 @@
 from aiogram import Router, types, F
 from aiogram.types import CallbackQuery
 from sqlalchemy import select
+from aiogram.fsm.context import FSMContext
 from bot.database.db import get_session
 from bot.database.models import User, Ad, Route
 from bot.utils import format_ad, format_route
@@ -20,11 +21,12 @@ from bot.keyboards.inline import ad_inline_keyboard, route_inline_keyboard
 router = Router()
 
 @router.message(F.text == "📋 Мои объявления")
-async def my_ads(message: types.Message):
+async def my_ads(message: types.Message, state: FSMContext):
     """
     Обрабатывает команду "📋 Мои объявления"
     Показывает объявления (Ad) и маршруты (Route), созданные текущим пользователем
     """
+    state.clear()
     telegram_id = message.from_user.id
 
     async for session in get_session():

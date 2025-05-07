@@ -34,6 +34,7 @@ async def start_route(message: types.Message, state: FSMContext):
     """
     Старт FSM: спрашиваем, откуда пользователь вылетает.
     """
+    await state.clear()
     await message.answer("Откуда вы летите?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(RouteForm.from_location)
 
@@ -138,5 +139,5 @@ async def finish_route(message: types.Message, state: FSMContext):
         await notify_about_new_route(message.bot, new_route.id)
 
 
-    await message.answer("✅ Маршрут добавлен! Спасибо!", reply_markup=main_menu(is_admin=await IsAdmin()(message)))
+    await message.answer("✅ Маршрут добавлен! Спасибо!")
     await state.clear()

@@ -10,14 +10,11 @@ FSM: Подача объявления пользователем (ads).
 
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 import asyncio
 
 from bot.states.ads import AdForm
 from bot.database.models import Ad
 from bot.database.db import get_session
-from bot.filters.is_admin import IsAdmin
-from bot.keyboards.menu import main_menu
 from bot.keyboards.inline import ad_inline_keyboard
 from bot.utils import (
     get_user_or_reply,
@@ -35,7 +32,8 @@ async def start_ads(message: types.Message, state: FSMContext):
     """
     Старт FSM: спрашиваем, детали посылки.
     """
-    await message.answer("Что вы хотите отправить?", reply_markup=ReplyKeyboardRemove())
+    await state.clear()
+    await message.answer("Что вы хотите отправить?") #, reply_markup=ReplyKeyboardRemove())
     await state.set_state(AdForm.description)
 
 
@@ -143,5 +141,5 @@ async def input_price(message: types.Message, state: FSMContext):
         await notify_about_new_ad(message.bot, new_ad.id)
 
 
-    await message.answer("✅ Объявление добавлено!",reply_markup=main_menu(is_admin=await IsAdmin()(message)))
+    await message.answer("✅ Объявление добавлено!") #,reply_markup=main_menu(is_admin=await IsAdmin()(message)))
     await state.clear()
