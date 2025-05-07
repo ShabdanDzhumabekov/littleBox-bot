@@ -12,9 +12,12 @@ from .edit_route import router as edit_route_router
 from .feedback import router as feedback_router
 from .stats import router as stats_router
 from .admin import router as admin_router
+from .cancel import router as cancel_router
+
 
 def setup_routers() -> Router:
     router = Router()
+    router.include_router(cancel_router)
     router.include_router(start_router)
     router.include_router(help_router)
     router.include_router(ads_router)

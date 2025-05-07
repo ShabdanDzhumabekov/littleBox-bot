@@ -8,8 +8,6 @@
 
 from aiogram import Router, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot.filters.is_admin import IsAdmin
-from bot.keyboards.menu import main_menu
 
 router = Router()
 

@@ -17,6 +17,7 @@ from bot.database.db import get_session
 from bot.database.models import Feedback, User
 from bot.filters import IsAdmin
 from bot.constants import MAX_FEEDBACK_LENGTH
+from bot.utils import validate_text
 
 router = Router()
 
@@ -33,6 +34,7 @@ async def ask_feedback(message: types.Message, state: FSMContext):
     """
     Начало ввода отзыва. Просим пользователя написать текст.
     """
+    await state.clear()
     await message.answer("📝 Напишите свой отзыв, мы обязательно прочитаем!")
     await state.set_state(FeedbackForm.writing)
 
