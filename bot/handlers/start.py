@@ -51,7 +51,8 @@ async def cmd_start(message: types.Message):
         "• Разместить маршрут путешествия\n"
         "• Найти подходящего попутчика или посылку\n"
         "• Управлять своими объявлениями\n"
-        "• /help — список возможностей бота \n\n"
+        "• /help — список возможностей бота \n"
+        "• /rules — правила безопасности \n\n"
         "⬇️ Используй кнопки внизу чтобы начать!",
         reply_markup=main_menu(is_admin=await IsAdmin()(message)),
         parse_mode="HTML"

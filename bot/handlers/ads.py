@@ -16,6 +16,7 @@ from bot.states.ads import AdForm
 from bot.database.models import Ad
 from bot.database.db import get_session
 from bot.keyboards.inline import ad_inline_keyboard
+from bot.constants import WARNING_TEXT
 from bot.utils import (
     get_user_or_reply,
     get_location_or_reply,
@@ -134,7 +135,7 @@ async def input_price(message: types.Message, state: FSMContext):
 
         # ✉️ Показываем добавленное объявление
         await message.answer("Вот как выглядит ваше объявление:")
-        await message.answer(format_ad(new_ad), reply_markup=ad_inline_keyboard(new_ad.id), parse_mode="HTML")
+        await message.answer(format_ad(new_ad) + WARNING_TEXT, reply_markup=ad_inline_keyboard(new_ad.id), parse_mode="HTML")
 
         # Отправляем уведомление пользователю с похожим маршрутом
         await asyncio.sleep(2)

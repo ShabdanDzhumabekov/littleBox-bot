@@ -19,6 +19,7 @@ def main_menu(is_admin: bool = False) -> ReplyKeyboardMarkup:
         [KeyboardButton(text="🔍 Найти посылку")],
         [KeyboardButton(text="📋 Мои объявления")],
         [KeyboardButton(text="💬 Оставить отзыв")],
+        [KeyboardButton(text="📌 Безопасность")],
         [KeyboardButton(text="🏠 Главное меню")]
     ]
 
