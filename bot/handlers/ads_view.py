@@ -10,7 +10,7 @@ from bot.states.ads_view import FindAdForm
 from bot.utils.location import parse_location
 from sqlalchemy import select
 from datetime import datetime
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import Ad, User
 
 router = Router()
@@ -43,7 +43,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt = select(Ad, User).join(User).where(
             Ad.from_city == data["from_city"],
             Ad.from_country == data["from_country"],

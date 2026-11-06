@@ -6,7 +6,7 @@ from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import select
 
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import Route, User
 from bot.states.edit_route import EditRouteForm
 from bot.keyboards.inline import route_inline_keyboard
@@ -29,7 +29,7 @@ async def start_edit_route(callback: types.CallbackQuery, state: FSMContext):
     route_id = int(callback.data.split("_")[-1])
     telegram_id = callback.from_user.id
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt_user = select(User).where(User.telegram_id == telegram_id)
         user = (await session.execute(stmt_user)).scalar_one_or_none()
 
@@ -107,7 +107,7 @@ async def finish_edit(message: types.Message, state: FSMContext):
     if not user:
         return
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt_route = select(Route).where(Route.id == data["route_id"], Route.user_id == user.id)
         route = (await session.execute(stmt_route)).scalar_one_or_none()
 

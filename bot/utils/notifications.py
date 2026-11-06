@@ -16,7 +16,7 @@ from aiogram import Bot
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from bot.database.models import Ad, Route, User
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.utils import format_ad, format_route
 
 
@@ -27,7 +27,7 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
     :param bot: Экземпляр Telegram-бота
     :param ad: Объект объявления (Ad), только что добавленного
     """
-    async for session in get_session():
+    async with SessionLocal() as session:
         ad = await session.get(Ad, ad_id, options=[selectinload(Ad.user)])  # сразу загрузи user
         if not ad:
             return
@@ -60,7 +60,7 @@ async def notify_about_new_route(bot: Bot, route_id: int):
     :param bot: Экземпляр Telegram-бота
     :param route: Объект маршрута (Route), только что добавленного
     """
-    async for session in get_session():
+    async with SessionLocal() as session:
         route = await session.get(Route, route_id, options=[selectinload(Route.user)])
         if not route:
             return 

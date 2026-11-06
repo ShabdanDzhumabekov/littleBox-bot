@@ -10,7 +10,7 @@ from aiogram import Router, types, F
 from aiogram.filters import Command
 from sqlalchemy import select, func
 
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import User, Ad, Route, Feedback
 from bot.filters.is_admin import IsAdmin
 
@@ -22,7 +22,7 @@ async def show_stats(message: types.Message):
     """
     Показывает общую статистику по базе данных (только для админа).
     """
-    async for session in get_session():
+    async with SessionLocal() as session:
         users_count = await session.scalar(select(func.count()).select_from(User))
         ads_count = await session.scalar(select(func.count()).select_from(Ad))
         routes_count = await session.scalar(select(func.count()).select_from(Route))

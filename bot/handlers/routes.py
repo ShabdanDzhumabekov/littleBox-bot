@@ -14,7 +14,7 @@ import asyncio
 
 from bot.states.route import RouteForm
 from bot.database.models import Route
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.filters.is_admin import IsAdmin
 from bot.keyboards.menu import main_menu
 from bot.keyboards.inline import route_inline_keyboard
@@ -113,7 +113,7 @@ async def finish_route(message: types.Message, state: FSMContext):
     if not user:
         return
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         new_route = Route(
             user_id=user.id,
             from_city=data["from_city"],

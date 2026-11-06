@@ -3,7 +3,7 @@
 """
 
 from sqlalchemy import select
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import User
 
 
@@ -15,7 +15,7 @@ async def get_user_or_reply(telegram_id: int, message):
     :param message: Сообщение для ответа, если пользователь не найден
     :return: User объект или None
     """
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt = select(User).where(User.telegram_id == telegram_id)
         result = await session.execute(stmt)
         user = result.scalar_one_or_none()

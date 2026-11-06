@@ -13,7 +13,7 @@ from aiogram import Router, types, F
 from aiogram.types import CallbackQuery
 from sqlalchemy import select
 from aiogram.fsm.context import FSMContext
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import User, Ad, Route
 from bot.utils import format_ad, format_route
 from bot.keyboards.inline import ad_inline_keyboard, route_inline_keyboard
@@ -29,7 +29,7 @@ async def my_ads(message: types.Message, state: FSMContext):
     state.clear()
     telegram_id = message.from_user.id
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt_user = select(User).where(User.telegram_id == telegram_id)
         result_user = await session.execute(stmt_user)
         user = result_user.scalar_one_or_none()
@@ -69,7 +69,7 @@ async def delete_ad_callback(callback: CallbackQuery):
     telegram_id = callback.from_user.id
     ad_id = int(callback.data.split("_")[-1])
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt_user = select(User).where(User.telegram_id == telegram_id)
         result_user = await session.execute(stmt_user)
         user = result_user.scalar_one_or_none()
@@ -100,7 +100,7 @@ async def delete_route_callback(callback: CallbackQuery):
     telegram_id = callback.from_user.id
     route_id = int(callback.data.split("_")[-1])
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt_user = select(User).where(User.telegram_id == telegram_id)
         result_user = await session.execute(stmt_user)
         user = result_user.scalar_one_or_none()

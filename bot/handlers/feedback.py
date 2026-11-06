@@ -13,7 +13,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command
 from sqlalchemy import select
 
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import Feedback, User
 from bot.filters import IsAdmin
 from bot.constants import MAX_FEEDBACK_LENGTH
@@ -50,7 +50,7 @@ async def save_feedback(message: types.Message, state: FSMContext):
     text = message.text.strip()
     telegram_id = message.from_user.id
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt = select(User).where(User.telegram_id == telegram_id)
         user = (await session.execute(stmt)).scalar_one_or_none()
 
@@ -73,7 +73,7 @@ async def show_feedbacks(message: types.Message):
     Команда доступна только администратору.
     Показывает 5 последних отзывов с датой, username и текстом.
     """
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt = select(Feedback, User).join(User).order_by(Feedback.id.desc()).limit(5)
         result = await session.execute(stmt)
         feedbacks = result.all()

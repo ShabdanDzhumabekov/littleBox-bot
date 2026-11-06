@@ -14,7 +14,7 @@ import asyncio
 
 from bot.states.ads import AdForm
 from bot.database.models import Ad
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.keyboards.inline import ad_inline_keyboard
 from bot.constants import WARNING_TEXT
 from bot.utils import (
@@ -116,7 +116,7 @@ async def input_price(message: types.Message, state: FSMContext):
     if not user:
         return
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         new_ad = Ad(
             user_id=user.id,
             description=data["description"],

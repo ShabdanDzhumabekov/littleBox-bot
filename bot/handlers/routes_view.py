@@ -13,7 +13,7 @@ from bot.states.routes_view import FindRouteForm
 from bot.utils.location import parse_location
 from sqlalchemy import select
 from datetime import datetime
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.database.models import Route, User
 
 router = Router()
@@ -51,7 +51,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
     from_city = data.get("from_city")
     from_country = data.get("from_country")
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         # 1. Фильтруем маршруты по месту назначения (обязательно)
         stmt = select(Route, User).join(User).where(
             Route.to_country == to_country,

@@ -9,7 +9,7 @@ from aiogram import Router, types
 from aiogram.filters import CommandStart
 from bot.keyboards.menu import main_menu
 from bot.database.models import User
-from bot.database.db import get_session
+from bot.database.db import SessionLocal
 from bot.filters.is_admin import IsAdmin
 from sqlalchemy import select
 from datetime import date
@@ -27,7 +27,7 @@ async def cmd_start(message: types.Message):
     username = message.from_user.username
     today = date.today()
 
-    async for session in get_session():
+    async with SessionLocal() as session:
         stmt = select(User).where(User.telegram_id == telegram_id)
         result = await session.execute(stmt)
         user = result.scalar_one_or_none()
