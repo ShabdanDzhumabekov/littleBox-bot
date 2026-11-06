@@ -39,3 +39,25 @@ async def test_new_route_skips_sender_whose_ad_expired() -> None:
     await notify_about_new_route(fake_bot(telegram), route.id)
 
     assert telegram.texts_sent_to(121) == []
+
+
+async def test_new_ad_notification_offers_contact_button_when_sender_has_no_username() -> None:
+    await reset_database()
+    ad = an_ad(a_user(telegram_id=190, username=None))
+    await save(ad, a_route(a_user(telegram_id=191)))
+    telegram = FakeTelegram()
+
+    await notify_about_new_ad(fake_bot(telegram), ad.id)
+
+    assert telegram.buttons_of_last_message_to(191) == [f"contact_ad_{ad.id}"]
+
+
+async def test_new_route_notification_offers_contact_button_when_traveler_has_no_username() -> None:
+    await reset_database()
+    route = a_route(a_user(telegram_id=200, username=None))
+    await save(route, an_ad(a_user(telegram_id=201)))
+    telegram = FakeTelegram()
+
+    await notify_about_new_route(fake_bot(telegram), route.id)
+
+    assert telegram.buttons_of_last_message_to(201) == [f"contact_route_{route.id}"]

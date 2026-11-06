@@ -20,10 +20,10 @@ def sticker_message_update(user_id: int) -> Update:
     return Update(update_id=1, message=_message_from(user_id, sticker=sticker))
 
 
-def button_press_update(user_id: int, callback_data: str) -> Update:
+def button_press_update(user_id: int, callback_data: str, username: str | None = None) -> Update:
     callback_query = CallbackQuery(
         id="callback",
-        from_user=_user(user_id),
+        from_user=_user(user_id, username),
         chat_instance="chat",
         message=_message_from(user_id, text="message with buttons"),
         data=callback_data,
@@ -42,5 +42,5 @@ def _message_from(user_id: int, text: str | None = None, sticker: Sticker | None
     )
 
 
-def _user(user_id: int) -> User:
-    return User(id=user_id, is_bot=False, first_name="Test")
+def _user(user_id: int, username: str | None = None) -> User:
+    return User(id=user_id, is_bot=False, first_name="Test", username=username)

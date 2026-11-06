@@ -17,10 +17,12 @@ from datetime import date
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramForbiddenError
+from aiogram.types import InlineKeyboardMarkup
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from bot.database.models import Ad, Route, User
 from bot.database.db import SessionLocal
+from bot.keyboards.inline import contact_ad_keyboard, contact_route_keyboard
 from bot.utils import format_ad, format_route, format_author
 
 logger = logging.getLogger(__name__)
@@ -47,6 +49,7 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
         )
         result = await session.execute(stmt)
         matches = result.all()
+        contact_keyboard = None if ad.user.username else contact_ad_keyboard(ad.id)
 
         for route, user in matches:
             # Не уведомляем автора
@@ -56,7 +59,8 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
                     user.telegram_id,
                     "📦 Появилось новое объявление, подходящее под ваш маршрут:\n\n" +
                     format_ad(ad) + "\n" +
-                    format_author(ad.user)
+                    format_author(ad.user),
+                    contact_keyboard
                 )
 
 
@@ -81,6 +85,7 @@ async def notify_about_new_route(bot: Bot, route_id: int):
         )
         result = await session.execute(stmt)
         matches = result.all()
+        contact_keyboard = None if route.user.username else contact_route_keyboard(route.id)
 
         for ad, user in matches:
             # Не уведомляем автора
@@ -90,12 +95,15 @@ async def notify_about_new_route(bot: Bot, route_id: int):
                     user.telegram_id,
                     "🛫 Появился путешественник, подходящий под ваше объявление:\n\n" +
                     format_route(route) + "\n" +
-                    format_author(route.user)
+                    format_author(route.user),
+                    contact_keyboard
                 )
 
 
-async def _send_notification(bot: Bot, telegram_id: int, text: str) -> None:
+async def _send_notification(
+    bot: Bot, telegram_id: int, text: str, reply_markup: InlineKeyboardMarkup | None
+) -> None:
     try:
-        await bot.send_message(telegram_id, text, parse_mode="HTML")
+        await bot.send_message(telegram_id, text, reply_markup=reply_markup, parse_mode="HTML")
     except TelegramForbiddenError:
         logger.info("Notification skipped: user %s blocked the bot", telegram_id)

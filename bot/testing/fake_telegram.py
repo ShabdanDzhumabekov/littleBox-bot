@@ -28,6 +28,12 @@ class FakeTelegram(BaseSession):
     def texts_sent_to(self, chat_id: int) -> list[str]:
         return [message.text for message in self.sent_messages if message.chat_id == chat_id]
 
+    def buttons_of_last_message_to(self, chat_id: int) -> list[str]:
+        last_message = [message for message in self.sent_messages if message.chat_id == chat_id][-1]
+        if last_message.reply_markup is None:
+            return []
+        return [button.callback_data for row in last_message.reply_markup.inline_keyboard for button in row]
+
     async def stream_content(
         self,
         url: str,

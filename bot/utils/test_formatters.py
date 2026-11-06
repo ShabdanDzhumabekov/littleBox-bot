@@ -1,7 +1,7 @@
 import pytest
 
 from bot.testing.database import a_route, a_user, an_ad
-from bot.utils.formatters import format_ad, format_route
+from bot.utils.formatters import format_ad, format_author, format_route
 
 
 @pytest.mark.parametrize("field", ["description", "price", "from_city", "to_country"])
@@ -36,3 +36,16 @@ def test_format_route_renders_html_in_route_fields_as_plain_text(field: str) -> 
     text = format_route(route)
 
     assert '&lt;a href="https://phishing.example"&gt;оплата&lt;/a&gt;' in text
+
+
+@pytest.mark.parametrize(
+    ("username", "author_line"),
+    [("traveler", "👤 @traveler"), (None, "👤 Связаться можно через кнопку ниже")],
+    ids=["with-username", "without-username"],
+)
+def test_format_author_points_to_contact_button_only_without_username(username: str | None, author_line: str) -> None:
+    author = a_user(telegram_id=10, username=username)
+
+    text = format_author(author)
+
+    assert text == author_line

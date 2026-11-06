@@ -58,4 +58,6 @@ def format_author(author: User) -> str:
     :param author: Автор (User)
     :return: Строка для подписи под объявлением или маршрутом
     """
-    return f"👤 @{author.username or 'Без username'}"
+    if author.username:
+        return f"👤 @{author.username}"
+    return "👤 Связаться можно через кнопку ниже"

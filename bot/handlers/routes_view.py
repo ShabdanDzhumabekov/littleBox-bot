@@ -17,6 +17,7 @@ from datetime import datetime
 from bot.database.db import SessionLocal
 from bot.database.models import Route, User
 from bot.utils.formatters import format_route, format_author
+from bot.keyboards.inline import contact_route_keyboard
 
 router = Router()
 
@@ -91,6 +92,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
 
         for route, user in routes_to_show:
             text = format_route(route) + "\n" + format_author(user)
-            await message.answer(text, parse_mode="HTML")
+            contact_keyboard = None if user.username else contact_route_keyboard(route.id)
+            await message.answer(text, reply_markup=contact_keyboard, parse_mode="HTML")
 
     await state.clear()
