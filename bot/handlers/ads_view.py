@@ -13,7 +13,7 @@ from sqlalchemy import select
 from datetime import datetime
 from bot.database.db import SessionLocal
 from bot.database.models import Ad, User
-from bot.utils.formatters import format_ad
+from bot.utils.formatters import format_ad, format_author
 
 router = Router()
 
@@ -65,7 +65,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
         await message.answer(f"📦 Найдено: {len(ads)} объявлений")
 
         for ad, user in ads:
-            text = format_ad(ad) + f"\n👤 @{user.username or 'Без username'}"
+            text = format_ad(ad) + "\n" + format_author(user)
             await message.answer(text, parse_mode="HTML")
 
     await state.clear()

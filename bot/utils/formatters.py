@@ -4,13 +4,14 @@
 Содержит шаблонные функции:
 - format_ad(ad) — возвращает отформатированное описание объявления
 - format_route(route) — возвращает отформатированное описание маршрута
+- format_author(author) — возвращает строку с контактом автора
 """
 
 import re
 
 from aiogram import html
 
-from bot.database.models import Ad, Route
+from bot.database.models import Ad, Route, User
 
 
 def format_ad(ad: Ad) -> str:
@@ -48,3 +49,13 @@ def format_route(route: Route) -> str:
         f"🧳 {html.quote(route.luggage)}\n"
         f"💬 {html.quote(route.conditions or '—')}"
     )
+
+
+def format_author(author: User) -> str:
+    """
+    Возвращает строку с контактом автора объявления или маршрута.
+
+    :param author: Автор (User)
+    :return: Строка для подписи под объявлением или маршрутом
+    """
+    return f"👤 @{author.username or 'Без username'}"

@@ -21,7 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from bot.database.models import Ad, Route, User
 from bot.database.db import SessionLocal
-from bot.utils import format_ad, format_route
+from bot.utils import format_ad, format_route, format_author
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
                     user.telegram_id,
                     "📦 Появилось новое объявление, подходящее под ваш маршрут:\n\n" +
                     format_ad(ad) + "\n" +
-                    f"👤 @{ad.user.username or 'Без username'}"
+                    format_author(ad.user)
                 )
 
 
@@ -90,7 +90,7 @@ async def notify_about_new_route(bot: Bot, route_id: int):
                     user.telegram_id,
                     "🛫 Появился путешественник, подходящий под ваше объявление:\n\n" +
                     format_route(route) + "\n" +
-                    f"👤 @{route.user.username or 'Без username'}"
+                    format_author(route.user)
                 )
 
 
