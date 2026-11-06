@@ -14,6 +14,7 @@ from .stats import router as stats_router
 from .admin import router as admin_router
 from .cancel import router as cancel_router
 from .safety import router as safety_router
+from .form_fallback import router as form_fallback_router
 
 
 def setup_routers() -> Router:
@@ -32,5 +33,6 @@ def setup_routers() -> Router:
     router.include_router(feedback_router)
     router.include_router(stats_router)
     router.include_router(admin_router)
+    router.include_router(form_fallback_router)
 
     return router
