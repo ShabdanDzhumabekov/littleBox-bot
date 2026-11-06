@@ -6,11 +6,15 @@
 import asyncio
 
 from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
+from geopy.exc import GeocoderServiceError
 from aiogram.types import Message
 
 # Инициализация геокодера
 geolocator = Nominatim(user_agent="littleBox")
+
+
+class GeocodingUnavailableError(Exception):
+    """Nominatim не ответил: таймаут, лимит запросов или сервис недоступен."""
 
 
 async def parse_location(text: str):
@@ -19,13 +23,14 @@ async def parse_location(text: str):
 
     :param text: Строка вида "Москва, Россия"
     :return: (город, страна) или (None, None)
+    :raises GeocodingUnavailableError: если Nominatim не ответил
     """
     try:
         location = await asyncio.to_thread(
             geolocator.geocode, text, addressdetails=True, language="ru", timeout=5
         )
-    except GeocoderTimedOut:
-        return "timeout", "timeout"
+    except GeocoderServiceError as error:
+        raise GeocodingUnavailableError from error
 
     if not location:
         return None, None
@@ -52,10 +57,6 @@ async def get_location_or_reply(message: Message):
     """
     city, country = await parse_location(message.text)
     
-    if (city, country) == ("timeout", "timeout"):
-        await message.answer("🌐 Временная ошибка при определении города. Попробуйте ещё раз.")
-        return None
-
     if not city or not country:
         await message.answer(
             "❗️Не удалось определить город и страну. Пример: <code>Город, Страна</code>",
