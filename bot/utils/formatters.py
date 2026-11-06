@@ -6,6 +6,8 @@
 - format_route(route) — возвращает отформатированное описание маршрута
 """
 
+import re
+
 from aiogram import html
 
 from bot.database.models import Ad, Route
@@ -22,8 +24,14 @@ def format_ad(ad: Ad) -> str:
         f"📝 <i>{html.quote(ad.description)}</i>\n"
         f"🌍 {html.quote(ad.from_city)}, {html.quote(ad.from_country)} ➡️ {html.quote(ad.to_city)}, {html.quote(ad.to_country)}\n"
         f"📅 Актуально до: {ad.approx_date.strftime('%d.%m.%Y')}\n"
-        f"💵 {html.quote(ad.price)}$"
+        f"💵 {_displayed_price(ad.price)}"
     )
+
+
+def _displayed_price(price: str) -> str:
+    if re.fullmatch(r"\d+([.,]\d+)?", price):
+        return f"{price}$"
+    return html.quote(price)
 
 
 def format_route(route: Route) -> str:
