@@ -26,7 +26,7 @@ async def my_ads(message: types.Message, state: FSMContext):
     Обрабатывает команду "📋 Мои объявления"
     Показывает объявления (Ad) и маршруты (Route), созданные текущим пользователем
     """
-    state.clear()
+    await state.clear()
     telegram_id = message.from_user.id
 
     async with SessionLocal() as session:
