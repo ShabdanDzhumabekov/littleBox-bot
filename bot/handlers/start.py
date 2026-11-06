@@ -41,6 +41,15 @@ async def cmd_start(message: types.Message):
             session.add(new_user)
             await session.commit()
             print(f"✅ New user registered: {telegram_id}")
+
+            # Отправляем предупреждение, если username отсутствует
+            if not username:
+                await message.answer(
+                    "⚠️ У тебя скрыт username в Telegram.\n\n"
+                    "Если кто-то захочет с тобой связаться через LittleBox, "
+                    "мы пришлем тебе его username, чтобы ты мог ответить.\n\n"
+                    "Ты можешь открыть username в настройках Telegram, чтобы другим было проще с тобой связаться."
+                )
         else:
             print(f"👤 Existing user: {telegram_id}")
 
