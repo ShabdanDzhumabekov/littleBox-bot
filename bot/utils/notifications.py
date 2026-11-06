@@ -12,12 +12,17 @@
 - Форматирует сообщение через функции format_ad и format_route
 """
 
+import logging
+
 from aiogram import Bot
+from aiogram.exceptions import TelegramForbiddenError
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from bot.database.models import Ad, Route, User
 from bot.database.db import SessionLocal
 from bot.utils import format_ad, format_route
+
+logger = logging.getLogger(__name__)
 
 
 async def notify_about_new_ad(bot: Bot, ad_id: int):
@@ -44,12 +49,12 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
         for route, user in matches:
             # Не уведомляем автора
             if user.telegram_id != ad.user.telegram_id:
-                await bot.send_message(
+                await _send_notification(
+                    bot,
                     user.telegram_id,
                     "📦 Появилось новое объявление, подходящее под ваш маршрут:\n\n" +
                     format_ad(ad) + "\n" +
-                    f"👤 @{ad.user.username or 'Без username'}",
-                    parse_mode="HTML"
+                    f"👤 @{ad.user.username or 'Без username'}"
                 )
 
 
@@ -77,10 +82,17 @@ async def notify_about_new_route(bot: Bot, route_id: int):
         for ad, user in matches:
             # Не уведомляем автора
             if user.telegram_id != route.user.telegram_id:
-                await bot.send_message(
+                await _send_notification(
+                    bot,
                     user.telegram_id,
                     "🛫 Появился путешественник, подходящий под ваше объявление:\n\n" +
                     format_route(route) + "\n" +
-                    f"👤 @{route.user.username or 'Без username'}",
-                    parse_mode="HTML"
+                    f"👤 @{route.user.username or 'Без username'}"
                 )
+
+
+async def _send_notification(bot: Bot, telegram_id: int, text: str) -> None:
+    try:
+        await bot.send_message(telegram_id, text, parse_mode="HTML")
+    except TelegramForbiddenError:
+        logger.info("Notification skipped: user %s blocked the bot", telegram_id)
