@@ -31,10 +31,7 @@ async def start_edit_route(callback: types.CallbackQuery, state: FSMContext):
     telegram_id = callback.from_user.id
 
     async with SessionLocal() as session:
-        stmt_user = select(User).where(User.telegram_id == telegram_id)
-        user = (await session.execute(stmt_user)).scalar_one_or_none()
-
-        stmt_route = select(Route).where(Route.id == route_id, Route.user_id == user.id)
+        stmt_route = select(Route).join(User).where(Route.id == route_id, User.telegram_id == telegram_id)
         route = (await session.execute(stmt_route)).scalar_one_or_none()
 
         if not route:

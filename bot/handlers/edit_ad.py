@@ -31,10 +31,7 @@ async def start_edit_ad(callback: types.CallbackQuery, state: FSMContext):
     telegram_id = callback.from_user.id
 
     async with SessionLocal() as session:
-        stmt_user = select(User).where(User.telegram_id == telegram_id)
-        user = (await session.execute(stmt_user)).scalar_one_or_none()
-
-        stmt_ad = select(Ad).where(Ad.id == ad_id, Ad.user_id == user.id)
+        stmt_ad = select(Ad).join(User).where(Ad.id == ad_id, User.telegram_id == telegram_id)
         ad = (await session.execute(stmt_ad)).scalar_one_or_none()
 
         if not ad:
