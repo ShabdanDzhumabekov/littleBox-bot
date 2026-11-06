@@ -13,6 +13,7 @@
 """
 
 import logging
+from datetime import date
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramForbiddenError
@@ -41,7 +42,8 @@ async def notify_about_new_ad(bot: Bot, ad_id: int):
             Route.from_city == ad.from_city,
             Route.from_country == ad.from_country,
             Route.to_city == ad.to_city,
-            Route.to_country == ad.to_country
+            Route.to_country == ad.to_country,
+            Route.travel_date >= date.today()
         )
         result = await session.execute(stmt)
         matches = result.all()
@@ -74,7 +76,8 @@ async def notify_about_new_route(bot: Bot, route_id: int):
             Ad.from_city == route.from_city,
             Ad.from_country == route.from_country,
             Ad.to_city == route.to_city,
-            Ad.to_country == route.to_country
+            Ad.to_country == route.to_country,
+            Ad.approx_date >= date.today()
         )
         result = await session.execute(stmt)
         matches = result.all()
