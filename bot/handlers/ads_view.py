@@ -7,6 +7,7 @@
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from bot.states.ads_view import FindAdForm
+from bot.filters import IsFreeText
 from bot.utils.location import parse_location
 from sqlalchemy import select
 from datetime import datetime
@@ -22,7 +23,7 @@ async def start_find_ad(message: types.Message, state: FSMContext):
     await message.answer("📍 Из какого города и страны будет отправка?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindAdForm.from_location)
 
-@router.message(FindAdForm.from_location)
+@router.message(FindAdForm.from_location, IsFreeText())
 async def input_from_location(message: types.Message, state: FSMContext):
     city, country = parse_location(message.text)
 
@@ -34,7 +35,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
     await message.answer("📦 Куда нужно доставить?\n\nПример: <code>\"Город, Страна\"</code>", parse_mode="HTML")
     await state.set_state(FindAdForm.to_location)
 
-@router.message(FindAdForm.to_location)
+@router.message(FindAdForm.to_location, IsFreeText())
 async def input_to_location(message: types.Message, state: FSMContext):
     to_city, to_country = parse_location(message.text)
 

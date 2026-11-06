@@ -13,6 +13,7 @@ from aiogram.fsm.context import FSMContext
 import asyncio
 
 from bot.states.ads import AdForm
+from bot.filters import IsFreeText
 from bot.database.models import Ad
 from bot.database.db import SessionLocal
 from bot.keyboards.inline import ad_inline_keyboard
@@ -38,7 +39,7 @@ async def start_ads(message: types.Message, state: FSMContext):
     await state.set_state(AdForm.description)
 
 
-@router.message(AdForm.description)
+@router.message(AdForm.description, IsFreeText())
 async def input_description(message: types.Message, state: FSMContext):
     """
     Получает описание посылки от пользователя.
@@ -51,7 +52,7 @@ async def input_description(message: types.Message, state: FSMContext):
     await state.set_state(AdForm.from_location)
 
 
-@router.message(AdForm.from_location)
+@router.message(AdForm.from_location, IsFreeText())
 async def input_from_location(message: types.Message, state: FSMContext):
     """
     Обрабатывает ввод места отправки. Распознаёт город и страну.
@@ -66,7 +67,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
     await state.set_state(AdForm.to_location)
 
 
-@router.message(AdForm.to_location)
+@router.message(AdForm.to_location, IsFreeText())
 async def input_to_location(message: types.Message, state: FSMContext):
     """
     Обрабатывает ввод места назначения. Распознаёт город и страну.
@@ -85,7 +86,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
     await state.set_state(AdForm.approx_date)
 
 
-@router.message(AdForm.approx_date)
+@router.message(AdForm.approx_date, IsFreeText())
 async def input_date(message: types.Message, state: FSMContext):
     """
     Получает дату в формате ДД.ММ.ГГГГ и проверяет её корректность.
@@ -100,7 +101,7 @@ async def input_date(message: types.Message, state: FSMContext):
     await state.set_state(AdForm.price)
 
 
-@router.message(AdForm.price)
+@router.message(AdForm.price, IsFreeText())
 async def input_price(message: types.Message, state: FSMContext):
     """
     Финальный шаг. Получает цену, сохраняет объявление в БД.

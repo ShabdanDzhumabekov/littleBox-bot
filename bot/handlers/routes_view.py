@@ -10,6 +10,7 @@
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from bot.states.routes_view import FindRouteForm
+from bot.filters import IsFreeText
 from bot.utils.location import parse_location
 from sqlalchemy import select
 from datetime import datetime
@@ -27,7 +28,7 @@ async def start_find_route(message: types.Message, state: FSMContext):
     await state.set_state(FindRouteForm.from_location)
 
 # 🔹 Шаг 2 — ввод "откуда"
-@router.message(FindRouteForm.from_location)
+@router.message(FindRouteForm.from_location, IsFreeText())
 async def input_from_location(message: types.Message, state: FSMContext):
     city, country = parse_location(message.text)
 
@@ -40,7 +41,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
     await state.set_state(FindRouteForm.to_location)
 
 # 🔹 Шаг 3 — ввод "куда" + фильтрация маршрутов
-@router.message(FindRouteForm.to_location)
+@router.message(FindRouteForm.to_location, IsFreeText())
 async def input_to_location(message: types.Message, state: FSMContext):
     to_city, to_country = parse_location(message.text)
 

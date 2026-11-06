@@ -9,6 +9,7 @@ from sqlalchemy import select
 from bot.database.db import SessionLocal
 from bot.database.models import Route, User
 from bot.states.edit_route import EditRouteForm
+from bot.filters import IsFreeText
 from bot.keyboards.inline import route_inline_keyboard
 from bot.utils import (
     get_location_or_reply,
@@ -45,7 +46,7 @@ async def start_edit_route(callback: types.CallbackQuery, state: FSMContext):
         await state.set_state(EditRouteForm.from_location)
 
 
-@router.message(EditRouteForm.from_location)
+@router.message(EditRouteForm.from_location, IsFreeText())
 async def edit_from_location(message: types.Message, state: FSMContext):
     result = await get_location_or_reply(message)
     if not result:
@@ -57,7 +58,7 @@ async def edit_from_location(message: types.Message, state: FSMContext):
     await state.set_state(EditRouteForm.to_location)
 
 
-@router.message(EditRouteForm.to_location)
+@router.message(EditRouteForm.to_location, IsFreeText())
 async def edit_to_location(message: types.Message, state: FSMContext):
     result = await get_location_or_reply(message)
     if not result:
@@ -69,7 +70,7 @@ async def edit_to_location(message: types.Message, state: FSMContext):
     await state.set_state(EditRouteForm.travel_date)
 
 
-@router.message(EditRouteForm.travel_date)
+@router.message(EditRouteForm.travel_date, IsFreeText())
 async def edit_date(message: types.Message, state: FSMContext):
     ok, result = validate_date_input(message.text)
     if not ok:
@@ -81,7 +82,7 @@ async def edit_date(message: types.Message, state: FSMContext):
     await state.set_state(EditRouteForm.luggage)
 
 
-@router.message(EditRouteForm.luggage)
+@router.message(EditRouteForm.luggage, IsFreeText())
 async def edit_luggage(message: types.Message, state: FSMContext):
     if not await validate_text(message, message.text):
         return
@@ -91,7 +92,7 @@ async def edit_luggage(message: types.Message, state: FSMContext):
     await state.set_state(EditRouteForm.conditions)
 
 
-@router.message(EditRouteForm.conditions)
+@router.message(EditRouteForm.conditions, IsFreeText())
 async def finish_edit(message: types.Message, state: FSMContext):
     """
     Финальное обновление маршрута в базе данных.

@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from bot.database.db import SessionLocal
 from bot.database.models import Feedback, User
-from bot.filters import IsAdmin
+from bot.filters import IsAdmin, IsFreeText
 from bot.constants import MAX_FEEDBACK_LENGTH
 from bot.utils import validate_text
 
@@ -39,7 +39,7 @@ async def ask_feedback(message: types.Message, state: FSMContext):
     await state.set_state(FeedbackForm.writing)
 
 
-@router.message(FeedbackForm.writing)
+@router.message(FeedbackForm.writing, IsFreeText())
 async def save_feedback(message: types.Message, state: FSMContext):
     """
     Сохраняет отзыв пользователя в базу данных.

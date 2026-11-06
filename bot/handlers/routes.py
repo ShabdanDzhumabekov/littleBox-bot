@@ -13,6 +13,7 @@ from aiogram.fsm.context import FSMContext
 import asyncio
 
 from bot.states.route import RouteForm
+from bot.filters import IsFreeText
 from bot.database.models import Route
 from bot.database.db import SessionLocal
 from bot.filters.is_admin import IsAdmin
@@ -39,7 +40,7 @@ async def start_route(message: types.Message, state: FSMContext):
     await state.set_state(RouteForm.from_location)
 
 
-@router.message(RouteForm.from_location)
+@router.message(RouteForm.from_location, IsFreeText())
 async def set_from_location(message: types.Message, state: FSMContext):
     """
     Обработка места отправления.
@@ -54,7 +55,7 @@ async def set_from_location(message: types.Message, state: FSMContext):
     await state.set_state(RouteForm.to_location)
 
 
-@router.message(RouteForm.to_location)
+@router.message(RouteForm.to_location, IsFreeText())
 async def set_to_location(message: types.Message, state: FSMContext):
     """
     Обработка места назначения.
@@ -69,7 +70,7 @@ async def set_to_location(message: types.Message, state: FSMContext):
     await state.set_state(RouteForm.travel_date)
 
 
-@router.message(RouteForm.travel_date)
+@router.message(RouteForm.travel_date, IsFreeText())
 async def set_travel_date(message: types.Message, state: FSMContext):
     """
     Обработка даты рейса.
@@ -84,7 +85,7 @@ async def set_travel_date(message: types.Message, state: FSMContext):
     await state.set_state(RouteForm.luggage)
 
 
-@router.message(RouteForm.luggage)
+@router.message(RouteForm.luggage, IsFreeText())
 async def set_luggage(message: types.Message, state: FSMContext):
     """
     Обработка ввода багажа.
@@ -97,7 +98,7 @@ async def set_luggage(message: types.Message, state: FSMContext):
     await state.set_state(RouteForm.conditions)
 
 
-@router.message(RouteForm.conditions)
+@router.message(RouteForm.conditions, IsFreeText())
 async def finish_route(message: types.Message, state: FSMContext):
     """
     Финальный шаг — сохранение маршрута в БД.
