@@ -15,6 +15,7 @@ from sqlalchemy import select
 from datetime import datetime
 from bot.database.db import SessionLocal
 from bot.database.models import Route, User
+from bot.utils.formatters import format_route
 
 router = Router()
 
@@ -88,14 +89,7 @@ async def input_to_location(message: types.Message, state: FSMContext):
         await message.answer(f"🛫 Найдено: {len(routes_to_show)} маршрутов")
 
         for route, user in routes_to_show:
-            text = (
-                f"🛫 <b>Маршрут</b>\n"
-                f"🌍 {route.from_city}, {route.from_country} ➡️ {route.to_city}, {route.to_country}\n"
-                f"📅 {route.travel_date.strftime('%d.%m.%Y')}\n"
-                f"🧳 {route.luggage}\n"
-                f"💬 {route.conditions or '—'}\n"
-                f"👤 @{user.username or 'Без username'}"
-            )
+            text = format_route(route) + f"\n👤 @{user.username or 'Без username'}"
             await message.answer(text, parse_mode="HTML")
 
     await state.clear()

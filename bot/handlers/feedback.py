@@ -7,7 +7,7 @@
 - Команда /feedbacks доступна только администратору — показывает последние отзывы
 """
 
-from aiogram import Router, types, F
+from aiogram import Router, types, F, html
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command
@@ -86,6 +86,6 @@ async def show_feedbacks(message: types.Message):
             text = (
                 f"📝 <b>Отзыв от @{user.username or 'Без username'}</b>\n"
                 f"🗓 {fb.created_at.strftime('%d.%m.%Y %H:%M')}\n\n"
-                f"{fb.text}"
+                f"{html.quote(fb.text)}"
             )
             await message.answer(text, parse_mode="HTML")
