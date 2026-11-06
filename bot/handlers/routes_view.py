@@ -30,7 +30,7 @@ async def start_find_route(message: types.Message, state: FSMContext):
 # 🔹 Шаг 2 — ввод "откуда"
 @router.message(FindRouteForm.from_location, IsFreeText())
 async def input_from_location(message: types.Message, state: FSMContext):
-    city, country = parse_location(message.text)
+    city, country = await parse_location(message.text)
 
     if not country:
         await message.answer("❗ Не удалось определить местоположение. Пример: <code>\"Бишкек, Кыргызстан\"</code>", parse_mode="HTML")
@@ -43,7 +43,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
 # 🔹 Шаг 3 — ввод "куда" + фильтрация маршрутов
 @router.message(FindRouteForm.to_location, IsFreeText())
 async def input_to_location(message: types.Message, state: FSMContext):
-    to_city, to_country = parse_location(message.text)
+    to_city, to_country = await parse_location(message.text)
 
     if not to_country:
         await message.answer("❗ Не удалось определить место назначения. Пример: <code>\"Белград, Сербия\"</code>", parse_mode="HTML")

@@ -25,7 +25,7 @@ async def start_find_ad(message: types.Message, state: FSMContext):
 
 @router.message(FindAdForm.from_location, IsFreeText())
 async def input_from_location(message: types.Message, state: FSMContext):
-    city, country = parse_location(message.text)
+    city, country = await parse_location(message.text)
 
     if not country:
         await message.answer("❗ Не удалось определить точку отправки. Пример: <code>Бишкек, Кыргызстан</code>", parse_mode="HTML")
@@ -37,7 +37,7 @@ async def input_from_location(message: types.Message, state: FSMContext):
 
 @router.message(FindAdForm.to_location, IsFreeText())
 async def input_to_location(message: types.Message, state: FSMContext):
-    to_city, to_country = parse_location(message.text)
+    to_city, to_country = await parse_location(message.text)
 
     if not to_country:
         await message.answer("❗ Не удалось определить точку назначения. Пример: <code>\"Белград, Сербия\"</code>", parse_mode="HTML")

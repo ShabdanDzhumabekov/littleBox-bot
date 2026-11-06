@@ -3,6 +3,8 @@
 Работают через Nominatim (OpenStreetMap).
 """
 
+import asyncio
+
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
 from aiogram.types import Message
@@ -11,7 +13,7 @@ from aiogram.types import Message
 geolocator = Nominatim(user_agent="littleBox")
 
 
-def parse_location(text: str):
+async def parse_location(text: str):
     """
     Извлекает город и страну из текста.
 
@@ -19,7 +21,9 @@ def parse_location(text: str):
     :return: (город, страна) или (None, None)
     """
     try:
-        location = geolocator.geocode(text, addressdetails=True, language="ru", timeout=5)
+        location = await asyncio.to_thread(
+            geolocator.geocode, text, addressdetails=True, language="ru", timeout=5
+        )
     except GeocoderTimedOut:
         return "timeout", "timeout"
 
@@ -46,7 +50,7 @@ async def get_location_or_reply(message: Message):
     :param message: Сообщение пользователя
     :return: (город, страна) или None
     """
-    city, country = parse_location(message.text)
+    city, country = await parse_location(message.text)
     
     if (city, country) == ("timeout", "timeout"):
         await message.answer("🌐 Временная ошибка при определении города. Попробуйте ещё раз.")
