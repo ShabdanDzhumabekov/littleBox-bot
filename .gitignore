@@ -13,3 +13,6 @@ __pycache__/
 
 # Mac и другие системные файлы
 .DS_Store
+
+# Тесты
+.pytest_cache/
