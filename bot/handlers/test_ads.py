@@ -31,3 +31,18 @@ async def test_ad_form_finishes_when_matching_traveler_blocked_bot() -> None:
     await dispatcher.feed_update(bot, text_message_update(SENDER_ID, "10"))
 
     assert await form.get_state() is None
+
+
+async def test_ad_form_confirms_to_sender_before_notifying_travelers() -> None:
+    await reset_database()
+    await save(a_user(telegram_id=SENDER_ID), a_route(a_user(telegram_id=TRAVELER_ID)))
+    telegram = FakeTelegram()
+    bot = fake_bot(telegram)
+    dispatcher = fresh_dispatcher()
+    form = user_form(dispatcher, bot, SENDER_ID)
+    await form.set_state(AdForm.price)
+    await form.set_data(ANSWERS_BEFORE_PRICE)
+
+    await dispatcher.feed_update(bot, text_message_update(SENDER_ID, "10"))
+
+    assert telegram.sent_messages[-1].chat_id == TRAVELER_ID

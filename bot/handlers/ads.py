@@ -10,7 +10,6 @@ FSM: Подача объявления пользователем (ads).
 
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
-import asyncio
 
 from bot.states.ads import AdForm
 from bot.filters import IsFreeText
@@ -138,10 +137,8 @@ async def input_price(message: types.Message, state: FSMContext):
         await message.answer("Вот как выглядит ваше объявление:")
         await message.answer(format_ad(new_ad) + WARNING_TEXT, reply_markup=ad_inline_keyboard(new_ad.id), parse_mode="HTML")
 
-        # Отправляем уведомление пользователю с похожим маршрутом
-        await asyncio.sleep(2)
-        await notify_about_new_ad(message.bot, new_ad.id)
-
-
     await message.answer("✅ Объявление добавлено!") #,reply_markup=main_menu(is_admin=await IsAdmin()(message)))
     await state.clear()
+
+    # Отправляем уведомление пользователю с похожим маршрутом
+    await notify_about_new_ad(message.bot, new_ad.id)
